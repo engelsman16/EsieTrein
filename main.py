@@ -14,6 +14,7 @@ class MyBot(commands.Bot):
         )
 
     async def setup_hook(self):
+        await self.load_extension(f"cogs._ns.ns")
         await bot.tree.sync(guild=discord.Object(id=959010133273370664))  # Esie
         bot.remove_command("help")
 

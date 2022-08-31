@@ -1,4 +1,5 @@
 import json
+from time import strptime
 import discord
 from discord.ext import commands, tasks
 import http.client, urllib.request, urllib.parse, urllib.error, base64
@@ -26,17 +27,20 @@ class TreinCheck(commands.Cog):
         planned_data = data["trips"][0]["legs"][0]["origin"]["plannedDateTime"]
         actual_data = data["trips"][0]["legs"][0]["origin"]["actualDateTime"]
 
-        print(type(actual_data))
+        objdate = datetime.datetime.strptime(actual_data, "%Y-%m-%dT%H:%M:%S%z")
+        correctdate = objdate.strftime("%H:%M")
+        cancel_status = True
+        
 
         embed = discord.Embed(
             title=f"🚅 Esie NS 🚅",
-            description=f"Your train will depart at {actual_data}",
-            color=discord.Color.yellow(),
+            description=f"Your train will depart at {correctdate}" if cancel_status == False else f"Your train is cancelled!",
+            color=discord.Color.from_rgb(0, 255, 0) if cancel_status == False and train_status == "NORMAL" else discord.Color.from_rgb(255, 0, 0),
         )
         embed.add_field(name="Train", value=f"{train_name} {train_number}", inline=False)
         embed.add_field(name="Origin", value=f"{origin_station}", inline=False)
-        embed.add_field(name="Destination", value=f"{destination_station}", inline=True)
-        embed.add_field(name="Cancelled", value=f"{cancel_status}", inline=False)
+        embed.add_field(name="Destination", value=f"{destination_station}", inline=False)
+        # embed.add_field(name="Cancelled", value=f"{cancel_status}", inline=False)
 
         embed.set_footer(text="🚀 Powered by Esie")
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/991385769518305342/1014608644022743120/unknown.png")

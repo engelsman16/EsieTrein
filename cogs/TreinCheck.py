@@ -15,11 +15,41 @@ class TreinCheck(commands.Cog):
     def cog_unload(self):
         self.check.cancel()
 
+    async def send_embed(self, data):
+
+        train_status = data["trips"][0]["status"]
+        cancel_status = data["trips"][0]["legs"][0]["cancelled"]
+        origin_station = data["trips"][0]["legs"][0]["origin"]["name"]
+        destination_station = data["trips"][0]["legs"][0]["destination"]["name"]
+        train_name = data["trips"][0]["legs"][0]["product"]["displayName"]
+        train_number = data["trips"][0]["legs"][0]["product"]["number"]
+        planned_data = data["trips"][0]["legs"][0]["origin"]["plannedDateTime"]
+        actual_data = data["trips"][0]["legs"][0]["origin"]["actualDateTime"]
+
+        print(type(actual_data))
+
+        embed = discord.Embed(
+            title=f"🚅 Esie NS 🚅",
+            description=f"Your train will depart at {actual_data}",
+            color=discord.Color.yellow(),
+        )
+        embed.add_field(name="Train", value=f"{train_name} {train_number}", inline=False)
+        embed.add_field(name="Origin", value=f"{origin_station}", inline=False)
+        embed.add_field(name="Destination", value=f"{destination_station}", inline=True)
+        embed.add_field(name="Cancelled", value=f"{cancel_status}", inline=False)
+
+        embed.set_footer(text="🚀 Powered by Esie")
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/991385769518305342/1014608644022743120/unknown.png")
+
+        await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=train_status))
+        channel = self.bot.get_channel(settings.CHANNELID)
+        await channel.send(embed=embed)
+
     @commands.Cog.listener()
     async def on_ready_cock(self):
         print("TreinCheck is online")
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=60)
     async def check(self):
         time = datetime.datetime.now() + datetime.timedelta(days=1)
         headers = {
@@ -42,9 +72,7 @@ class TreinCheck(commands.Cog):
             response = conn.getresponse()
             data = response.read().decode("utf-8")
             dataobj = json.loads(data)
-
-            train_status = dataobj["trips"][0]["status"]
-            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=train_status))
+            await self.send_embed(dataobj)
             conn.close()
 
         except Exception as e:

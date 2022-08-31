@@ -1,26 +1,30 @@
 from datetime import datetime
 from config import settings
 import discord
+import os
+import asyncio
 from discord.ext import commands
 
 
-class MyBot(commands.Bot):
-    def __init__(self):
-        super().__init__(
-            command_prefix="!",
-            intents=discord.Intents.all(),
-            application_id=settings.APPID,
-            activity=discord.Activity(type=discord.ActivityType.watching, name="rule 34 mineuk"),
-        )
-
-    async def setup_hook(self):
-        await self.load_extension(f"cogs._ns.ns")
-        await bot.tree.sync(guild=discord.Object(id=959010133273370664))  # Esie
-        bot.remove_command("help")
-
-    async def on_ready(self):
-        print(f"{self.user} Initialised {datetime.now()}")
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix=".", intents=intents)
 
 
-bot = MyBot()
-bot.run(settings.TOKEN)
+@bot.event
+async def on_ready():
+    print(f"{bot.user} Initialised {datetime.now()}")
+
+
+async def load():
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+            await bot.load_extension(f"cogs.{filename[:-3]}")
+
+
+async def main():
+    await load()
+    await bot.start(settings.TOKEN)
+
+
+asyncio.run(main())

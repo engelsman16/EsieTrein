@@ -34,12 +34,12 @@ class TreinCheck(commands.Cog):
 
         objdate = datetime.datetime.strptime(actual_data, "%Y-%m-%dT%H:%M:%S%z")
         correctdate = objdate.strftime("%H:%M")
-        
+
         objdate2 = datetime.datetime.strptime(planned_data, "%Y-%m-%dT%H:%M:%S%z")
         correctdate2 = objdate.strftime("%H:%M")
-        
+
         delay = int(correctdate[3:]) - int(correctdate2[3:])
-        
+
         if cancel_status == False and train_status == "NORMAL":
             description = f"Your train is planned to depart at {correctdate2}"
             color = discord.Color.from_rgb(0, 255, 0)
@@ -50,22 +50,21 @@ class TreinCheck(commands.Cog):
             description = f"Your train is delayed by {delay} minutes and will now deprated at {correctdate}"
             color = discord.Color.from_rgb(255, 255, 0)
 
-        embed = discord.Embed(
-            title=f"🚅 Esie NS 🚅",
-            description=description,
-            color=color
-        )
+        embed = discord.Embed(title=f"🚅 Esie NS 🚅", description=description, color=color)
         embed.add_field(name="Train", value=f"{train_name} {train_number}", inline=False)
         embed.add_field(name="Origin", value=f"{origin_station}", inline=False)
         embed.add_field(name="Destination", value=f"{destination_station}", inline=False)
         # embed.add_field(name="Cancelled", value=f"{cancel_status}", inline=False)
 
-        embed.set_footer(text="🚀 Powered by Esie")
+        now = datetime.datetime.now()
+        now_time = now.strftime("%H:%M:%S")
+
+        embed.set_footer(text="🚀 Powered by Esie || Lastest update: " + now_time)
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/991385769518305342/1014608644022743120/unknown.png")
 
         await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=train_status))
         channel = self.bot.get_channel(settings.CHANNELID)
-        
+
         if embedExists == False:
             print("Embed does not exist, sending embed")
             await channel.purge(limit=10)
@@ -77,15 +76,15 @@ class TreinCheck(commands.Cog):
                 description=f"Your train will depart at {correctdate}" if cancel_status == False else f"Your train is cancelled!",
                 color=discord.Color.from_rgb(0, 255, 0) if cancel_status == False and train_status == "NORMAL" else discord.Color.from_rgb(255, 0, 0),
             )
-            
+
             newembed.add_field(name="Train", value=f"{train_name} {train_number}", inline=False)
             newembed.add_field(name="Origin", value=f"{origin_station}", inline=False)
             newembed.add_field(name="Destination", value=f"{destination_station}", inline=False)
             # embed.add_field(name="Cancelled", value=f"{cancel_status}", inline=False)
 
-            newembed.set_footer(text="🚀 Powered by Esie")
+            newembed.set_footer(text="🚀 Powered by Esie || Lastest update: " + now_time)
             newembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/991385769518305342/1014608644022743120/unknown.png")
-        
+
             await msg.edit(embed=newembed)
             print("Embed edited.")
 

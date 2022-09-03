@@ -36,7 +36,7 @@ class TreinCheck(commands.Cog):
         correctdate = objdate.strftime("%H:%M")
 
         objdate2 = datetime.datetime.strptime(planned_data, "%Y-%m-%dT%H:%M:%S%z")
-        correctdate2 = objdate.strftime("%H:%M")
+        correctdate2 = objdate2.strftime("%H:%M")
 
         delay = int(correctdate[3:]) - int(correctdate2[3:])
 
@@ -59,7 +59,7 @@ class TreinCheck(commands.Cog):
         now = datetime.datetime.now()
         now_time = now.strftime("%H:%M:%S")
 
-        embed.set_footer(text="🚀 Powered by Esie || Lastest update: " + now_time)
+        embed.set_footer(text="🚀 Powered by Esie || Last update: " + now_time)
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/991385769518305342/1014608644022743120/unknown.png")
 
         await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=train_status))
@@ -73,8 +73,8 @@ class TreinCheck(commands.Cog):
         elif embedExists == True:
             newembed = discord.Embed(
                 title=f"🚅 Esie NS 🚅",
-                description=f"Your train will depart at {correctdate}" if cancel_status == False else f"Your train is cancelled!",
-                color=discord.Color.from_rgb(0, 255, 0) if cancel_status == False and train_status == "NORMAL" else discord.Color.from_rgb(255, 0, 0),
+                description=description,
+                color=color,
             )
 
             newembed.add_field(name="Train", value=f"{train_name} {train_number}", inline=False)
@@ -82,7 +82,7 @@ class TreinCheck(commands.Cog):
             newembed.add_field(name="Destination", value=f"{destination_station}", inline=False)
             # embed.add_field(name="Cancelled", value=f"{cancel_status}", inline=False)
 
-            newembed.set_footer(text="🚀 Powered by Esie || Lastest update: " + now_time)
+            newembed.set_footer(text="🚀 Powered by Esie || Last update: " + now_time)
             newembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/991385769518305342/1014608644022743120/unknown.png")
 
             await msg.edit(embed=newembed)
